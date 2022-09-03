@@ -5,8 +5,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import java.util.List;
 
-public class CreateStudentDemo {
+
+public class QueryStudentDemo {
 
     public static void main(String[] args) {
 
@@ -21,18 +23,43 @@ public class CreateStudentDemo {
 
         try {
 
-
-            // create a student object
-            System.out.println("Creating a new student object...");
-            Student tempStudent = new Student("Paul", "Wall", "paul@gmail.com");
-
             // start a transaction
             session.beginTransaction();
 
+            // query student
+            List<Student> theStudent = session
+                    .createQuery("from Student").getResultList();
 
-            // save the student
-            System.out.println("Saving the student ...");
-            session.save(tempStudent);
+
+            // display the student
+            displayStudnets(theStudent);
+
+            // query students: lastName='Doe'
+            theStudent = session
+                    .createQuery("from Student s where s.lastName='Doe'").list();
+
+            // display student
+            System.out.println("\nStudent who have last name of Doe");
+            displayStudnets(theStudent);
+
+            // query students: lastName 'Doe' OR firstName: 'Daffy'
+            theStudent = session
+                    .createQuery("from Student s where " +
+                            "s.lastName='Doe' OR s.firstName='Daffy'").list();
+
+            // display student
+            System.out.println("\nStudent who have last name of Doe OR firstName Daffy");
+            displayStudnets(theStudent);
+
+            // query students: where email LIKE '%gmail.com
+            theStudent = session
+                    .createQuery("from Student s where " +
+                            "s.email LIKE '%gmail.com'").list();
+
+            // display student
+            System.out.println("\nStudent who have gmail email");
+            displayStudnets(theStudent);
+
 
             // commit transaction
             session.getTransaction().commit();
@@ -41,6 +68,12 @@ public class CreateStudentDemo {
 
         }finally {
             factory.close();
+        }
+    }
+
+    private static void displayStudnets(List<Student> theStudent) {
+        for (Student temStudent : theStudent) {
+            System.out.println(temStudent);
         }
     }
 }
